@@ -1,0 +1,105 @@
+
+/* navbar */
+.navbar{background-color: var(--nav-bg);border-bottom: 1px solid #f0ede8;}
+
+/* navbard*/
+.navbar-brand{color: #E8440A}
+
+/* nablink */
+.nav-link:hover
+{
+    color: var(--color-primary-dark);
+    border: 1px solid var(--color-primary-dark) !important;
+}
+
+/* landing page */
+
+.landing{background: var(--background);}
+.landing-content { color: var(--white-text);}
+
+#connect{ background: var(--background);}
+
+footer{background-color: var(--color-primary); color: var(--white-text);}
+
+
+.landing-svg{
+    width: 100%;
+    max-width: 500px;
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float{
+    0%{transform: translateY(0);}
+    50%{transform: translateY(-40px);}
+    100%{transform: translateY(0);}
+}
+
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+    .landing {
+        height: 650px !important;
+    }
+}
+
+h1 {
+    font-family: gt-super, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-size: 3rem;
+    font-weight: 700;
+    font-size: 70px;
+    letter-spacing: -0.055em;
+    line-height: 71px;
+}
+
+h3{    font-family: sohne, "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* about */
+.aboutTop-sub, .about-sub,.card-title,.card-text,.top-sub{font-family: 'Segoe UI', system-ui, sans-serif;}
+
+.aboutTop-sub , .top-sub
+{
+    font-size: 0.72rem;letter-spacing: 0.2em;
+    text-transform: uppercase;font-weight: 700;
+}
+
+.aboutTop-sub{color: #E8440A;}
+.top-sub,.connect-heading{color:white ;}
+
+ .about-heading ,.connect-heading
+ {
+    font-family: gt-super, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-size: 2.6rem;font-weight: 700;
+    line-height: 1.1;
+  }
+  .about-heading{color: #b05a2f;}
+
+.about-sub {font-size: 0.97rem;line-height: 1.7;}
+
+.card-header { font-size: 40px; }
+
+.card-title {
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+
+  }
+
+.card-subtitle{
+    font-family: gt-super, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.card-text {
+    font-size: 0.84rem;
+    font-weight: 100;
+  }
+
+  .star-rating {font-size: 24px; }
+.star-rating .filled {color: gold; }
+.star-rating .empty {color: #ccc;}
+
+

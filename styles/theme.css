@@ -1,0 +1,15 @@
+:root {
+  --color-primary:      #E8440A;
+  --color-primary-dark: #C73A08;
+
+  
+
+  --background:    linear-gradient(135deg, #E8440A 0%, #ff6b35 60%, #C73A08 100%);
+  --card-a:  linear-gradient(135deg, #E8440A, #C73A08);
+  --card-b:  linear-gradient(135deg, #C73A08, #8B2505);
+  --footer-bg:  linear-gradient(90deg, #C73A08, #E8440A);
+
+  --nav-bg:       #ffffff;
+  --white-text:#ffffff;
+  --text-on-white:#E8440A;
+}
