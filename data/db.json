@@ -199,6 +199,45 @@
       "bio": "A curious reader with a passion for health, lifestyle, and education articles.",
       "createdDate": "2026-07-15T12:02:11.739Z",
       "id": "De5cmDvqr90"
+    },
+    {
+      "firstName": "sanjay",
+      "lastName": "sam",
+      "email": "Sanjay05@gmail.com",
+      "userId": "a125",
+      "password": "Sanjay@2005",
+      "dateOfBirth": "2005-07-20",
+      "gender": "Male",
+      "role": "Author",
+      "bio": "Sanjay",
+      "createdDate": "2026-08-13T05:27:36.760Z",
+      "id": "flkXEdvTkS4"
+    },
+    {
+      "firstName": "sanjaysam",
+      "lastName": "sam",
+      "email": "Sanjay06@gmail.com",
+      "userId": "a129",
+      "password": "Sanjay@2005",
+      "dateOfBirth": "2005-07-20",
+      "gender": "Male",
+      "role": "Author",
+      "bio": "Sanjay",
+      "createdDate": "2026-08-13T05:31:13.842Z",
+      "id": "3IY3NxbPAfI"
+    },
+    {
+      "firstName": "sasaasa",
+      "lastName": "saasasa",
+      "email": "san@gmail.com",
+      "userId": "a123",
+      "password": "Sanjay@2005",
+      "dateOfBirth": "2005-07-21",
+      "gender": "Male",
+      "role": "Reader",
+      "bio": "fdzd",
+      "createdDate": "2026-08-13T05:34:52.195Z",
+      "id": "4NoTX7p6ZhE"
     }
   ],
   "articles": [
