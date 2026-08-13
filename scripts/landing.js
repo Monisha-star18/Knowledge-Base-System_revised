@@ -171,7 +171,8 @@ $(document).ready(function()
     $("#clearSignUp").on("click", clearSignUp)
 
     // function that working after the validation is performed in the registration
-    async function signUp(){
+    async function signUp()
+    {
         // get the email 
         const email  = $("#s-email").val().trim();
         // get the user id
@@ -248,11 +249,80 @@ $(document).ready(function()
 
 
         } 
+
         catch (err) 
         {
             await Swal.fire({ icon: "error", title: "Cannot connect to server", text: "Please try again later." });
         }
 
     }
+
+    //function that works on the login 
+    $("#loginBtn").on("click", async function (e)
+        {
+            e.preventDefault();
+
+            const userId = $("#l-userId").val().trim();
+            const password = $("#l-password").val().trim();
+
+            console.log(userId)
+
+            if (!userId || !password)
+            {
+                Swal.fire({icon: "warning",title: "Please enter User ID and Password"});
+                return;
+            }
+
+            try
+            {
+                const result = await fetch(`${API}/users?userId=${userId}`);
+                const users = await result.json();
+
+                console.log()
+
+                if (users.length === 0)
+                {
+                    Swal.fire({icon: "error",title: "User ID Not Found"});
+                    return;
+                }
+
+                const user = users[0];
+
+                if (user.password !== password)
+                {
+                    Swal.fire({icon: "error",title: "Incorrect Password"});
+                    return;
+                }
+
+                // Store logged-in user (without password)
+                const { password: _pw, ...safeUser } = user;
+                localStorage.setItem("loggedUser", JSON.stringify(safeUser));
+
+                await Swal.fire({icon: "success",title: "Login Successful!",text: `Welcome, ${user.firstName}!`,timer: 1500,showConfirmButton: false})
+                .then(()=>
+                {
+                    // Redirect based on role
+                    if (user.role === "Reader")
+                    {
+                        window.location.href = "../pages/userDashboard.html";
+                    }
+                    else if (user.role === "Author")
+                    {
+                        window.location.href = "../pages/authorDashboard.html";
+                    }
+                    else if (user.role === "Admin")
+                    {
+                        window.location.href = "../pages/adminDashboard.html";
+                    }
+
+                })
+
+                
+            }
+            catch (err)
+            {
+                Swal.fire({icon: "error",title: "Cannot connect to server"});
+            }
+        });
 
 });
