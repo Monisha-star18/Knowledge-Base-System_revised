@@ -160,9 +160,7 @@ $(document).ready(function()
         submitHandler: function (form) { signUp(); }
     })
 
-    // function connect to the clean button in the sigup model 
-    //used to clear the form 
-
+    //used to clear the sign up form 
     function clearSignUp(){
         console.log("clicked")
         document.getElementById("signUpForm").reset();  // native reset of field values
@@ -172,9 +170,11 @@ $(document).ready(function()
 
     $("#clearSignUp").on("click", clearSignUp)
 
+    // function that working after the validation is performed in the registration
     async function signUp(){
-
+        // get the email 
         const email  = $("#s-email").val().trim();
+        // get the user id
         const userId = $("#s-userId").val().trim();
 
         try 
@@ -210,7 +210,7 @@ $(document).ready(function()
                 firstName: $("#s-firstName").val().trim(),
                 lastName: $("#s-lastName").val().trim(),
                 email: email,
-                userId: String($("#s-userId").val().trim()), // Store as string
+                userId: $("#s-userId").val().trim(),
                 password: $("#s-password").val().trim(),
                 dateOfBirth: $("#s-dateOfBirth").val(),
                 gender:$("input[name='gender']:checked").val(),
@@ -226,13 +226,16 @@ $(document).ready(function()
                 body:    JSON.stringify(userData)
             });
 
+            // if cant post the data in json
             if (!saveRes.ok) {
                 await Swal.fire({ icon: "error", title: "Error", text: "Could not create account. Please try again." });
                 return;
             }
 
+            //used to clear the sign up form 
             clearSignUp();
 
+            // give succefully post message 
             await Swal.fire({ icon: "success", title: "Successfully signed up!", text: "You can now log in." })
             .then(() => {
 

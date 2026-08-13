@@ -238,6 +238,19 @@
       "bio": "fdzd",
       "createdDate": "2026-08-13T05:34:52.195Z",
       "id": "4NoTX7p6ZhE"
+    },
+    {
+      "firstName": "Sanjay",
+      "lastName": "Sam Mathew",
+      "email": "sanjay01@gmail.com",
+      "userId": "sanjay124",
+      "password": "@Sanjay123",
+      "dateOfBirth": "2005-07-20",
+      "gender": "Male",
+      "role": "Reader",
+      "bio": "A technology enthusiast",
+      "createdDate": "2026-08-13T06:52:18.395Z",
+      "id": "zbOA_0OwM-o"
     }
   ],
   "articles": [
