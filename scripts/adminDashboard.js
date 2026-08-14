@@ -2,6 +2,7 @@
 let loggedUser = null;
 let localArticles = []; 
 let currentFilter = "all";
+const articleService = new ArticleService(API);
 
 $(document).ready(async function () 
 {
@@ -41,23 +42,21 @@ $(document).ready(async function ()
 
 
 // Fetch articles written in specific category
-async function fetchAndRenderArticles()
+async function fetchAndRenderArticles() 
 {
+
     try 
     {
-        const res = await fetch(`${API}/articles?category=${loggedUser.category}&isDeleted=false`);
-        if (!res.ok) throw new Error("Failed to load articles");
-        localArticles = await res.json();
+        localArticles = await articleService.getArticles(loggedUser.category);
         renderCards();
-        
-    } 
+    }
+
     catch (err) 
     {
         console.error(err);
-        Swal.fire({ icon: "error", title: "Error loading dashboard feed." });
+        Swal.fire({icon: "error",title: "Error loading dashboard feed."});
     }
 }
-
 // Dynamically generate layout cards based on filter and search rules
 function renderCards() {
     const container = $("#cards-container");
@@ -218,13 +217,16 @@ $(document).on("click", ".btn-card-accept, .btn-card-reject", async function ()
     try 
     {
         const reviewDate = new Date().toLocaleDateString();
-        const res = await fetch(`${API}/articles/${articleId}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({status: action,remark,reviewDate,reviewedBy: loggedUser.userId})
-        });
 
-        if (!res.ok) throw new Error("Failed to update article status.");
+            const updatedArticle =
+                await articleService.updateArticle( articleId,
+                    {
+                        status: action,
+                        remark: remark,
+                        reviewDate: reviewDate,
+                        reviewedBy: loggedUser.userId
+                    }
+                );
 
         // Update local cache so re-render reflects the change instantly
         const idx = localArticles.findIndex(a => a.id == articleId);

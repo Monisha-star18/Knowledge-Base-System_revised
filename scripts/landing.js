@@ -2,7 +2,7 @@
 
 $(document).ready(function()
 {
-    // // custom rule for date 
+    //custom rule for date 
     $.validator.addMethod(
         //rule name
         "validDob" ,
@@ -325,4 +325,4 @@ $(document).ready(function()
             }
         });
 
-});
+});  
