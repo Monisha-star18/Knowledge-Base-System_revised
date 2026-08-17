@@ -1,5 +1,8 @@
 // Base URL of the JSON Server API.
-const API = "http://localhost:3000";
+// const API = "http://localhost:3000";
+
+export const API = 'http://localhost:3000'; // Change this to your actual API URL
+
 
 // Populates the user profile information on the page.
 function setupProfile(loggedUser) 

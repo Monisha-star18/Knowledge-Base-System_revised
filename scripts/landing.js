@@ -1,4 +1,6 @@
-
+import bcrypt from "https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/+esm";
+import { API } from './shared.js'; // Import API from shared.js
+import { UserService } from './services/userService.js';
 
 $(document).ready(function()
 {
@@ -164,14 +166,90 @@ $(document).ready(function()
     })
 
     //used to clear the sign up form 
-    function clearSignUp(){
-        console.log("clicked")
-        document.getElementById("signUpForm").reset();  // native reset of field values
+    async function signUp() {
+    // get the email 
+    const email = $("#s-email").val().trim();
+    // get the user id
+    const userId = $("#s-userId").val().trim();
 
-        if (signUpValidator) {signUpValidator.resetForm();}  // clears plugin's internal state + error messages/classes 
+    console.log("🚀 SignUp started with:", { email, userId });
+    console.log("📡 API URL:", API);
+
+    try {
+        // Check email duplicate
+        console.log("🔍 Checking if email exists...");
+        const emailData = await userService.getUserByEmail(email);
+        console.log("📧 Email check result:", emailData);
+
+        if (emailData.length > 0) {
+            console.log("❌ Email already exists");
+            $("#s-email").removeClass("is-valid").addClass("is-invalid");
+            $("#sd-email").show().text("Email already registered");
+            Swal.fire({ icon: "error", title: "Email already registered" });
+            return;
+        }
+
+        // Check userId duplicate
+        console.log("🔍 Checking if userId exists...");
+        const userIdData = await userService.getUserByUserId(userId);
+        console.log("🆔 UserId check result:", userIdData);
+
+        if (userIdData.length > 0) {
+            console.log("❌ UserId already exists");
+            $("#s-userId").removeClass("is-valid").addClass("is-invalid");
+            $("#sd-userId").show().text("User ID already exists");
+            Swal.fire({ icon: "error", title: "User ID already exists" });
+            return;
+        }
+
+        const password = $("#s-password").val().trim();
+        const hashedPassword = bcrypt.hashSync(password, 10);
+
+        // Build user object
+        const userData = {
+            firstName: $("#s-firstName").val().trim(),
+            lastName: $("#s-lastName").val().trim(),
+            email: email,
+            userId: userId,
+            password: hashedPassword,
+            dateOfBirth: $("#s-dateOfBirth").val(),
+            gender: $("input[name='gender']:checked").val(),
+            role: $("#s-role").val(),
+            bio: $("#s-bio").val().trim(),
+            createdDate: new Date().toISOString()
+        };
+
+        console.log("📤 Sending user data:", userData);
+
+        // POST 
+        const result = await userService.createUser(userData);
+        console.log("✅ Registration successful:", result);
+
+        // clearSignUp();
+
+        await Swal.fire({ 
+            icon: "success", 
+            title: "Successfully signed up!", 
+            text: "You can now log in." 
+        }).then(() => {
+            const signupModal = bootstrap.Modal.getInstance(document.getElementById("signUpModal"));
+            signupModal.hide();
+            const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+            loginModal.show();
+        });
+
+    } catch (err) {
+        console.error("❌ SIGN UP ERROR:", err);
+        console.error("Error details:", err.message);
+        await Swal.fire({ 
+            icon: "error", 
+            title: "Cannot connect to server", 
+            text: `Error: ${err.message}. Please try again later.` 
+        });
     }
+}
 
-    $("#clearSignUp").on("click", clearSignUp)
+    // $("#clearSignUp").on("click", clearSignUp)
 
     // function that working after the validation is performed in the registration
     async function signUp()
@@ -207,13 +285,16 @@ $(document).ready(function()
                 return;
             }
 
+            const password = $("#s-password").val().trim();
+            const hashedPassword = bcrypt.hashSync(password, 10);
+
             // Build user object
             const userData = {
                 firstName: $("#s-firstName").val().trim(),
                 lastName: $("#s-lastName").val().trim(),
                 email: email,
                 userId: $("#s-userId").val().trim(),
-                password: $("#s-password").val().trim(),
+                password: hashedPassword,
                 dateOfBirth: $("#s-dateOfBirth").val(),
                 gender:$("input[name='gender']:checked").val(),
                 role:$("#s-role").val(),
@@ -225,7 +306,7 @@ $(document).ready(function()
             await userService.createUser(userData);
 
             //used to clear the sign up form 
-            clearSignUp();
+            // clearSignUp();
 
             // give succefully post message 
             await Swal.fire({ icon: "success", title: "Successfully signed up!", text: "You can now log in." })
@@ -243,6 +324,7 @@ $(document).ready(function()
 
         catch (err) 
         {
+            console.error("SIGN UP ERROR:", err);
             await Swal.fire({ icon: "error", title: "Cannot connect to server", text: "Please try again later." });
         }
 
@@ -276,7 +358,10 @@ $(document).ready(function()
 
                 const user = users[0];
 
-                if (user.password !== password)
+                const isValid = bcrypt.compareSync( password, user.password);
+
+
+                if (!isValid)
                 {
                     Swal.fire({icon: "error",title: "Incorrect Password"});
                     return;

@@ -201,56 +201,30 @@
       "id": "De5cmDvqr90"
     },
     {
-      "firstName": "sanjay",
-      "lastName": "sam",
-      "email": "Sanjay05@gmail.com",
-      "userId": "a125",
-      "password": "Sanjay@2005",
+      "firstName": "Sanjay",
+      "lastName": "Sanjay",
+      "email": "Sanjay@email.com",
+      "userId": "sanjay01",
+      "password": "$2a$10$qXD6ZWD/ryzPr9EnSaPhYuP6T6p4cDRKvEQLusLIlGXWWtKNeiaRq",
       "dateOfBirth": "2005-07-20",
-      "gender": "Male",
-      "role": "Author",
-      "bio": "Sanjay",
-      "createdDate": "2026-08-13T05:27:36.760Z",
-      "id": "flkXEdvTkS4"
-    },
-    {
-      "firstName": "sanjaysam",
-      "lastName": "sam",
-      "email": "Sanjay06@gmail.com",
-      "userId": "a129",
-      "password": "Sanjay@2005",
-      "dateOfBirth": "2005-07-20",
-      "gender": "Male",
-      "role": "Author",
-      "bio": "Sanjay",
-      "createdDate": "2026-08-13T05:31:13.842Z",
-      "id": "3IY3NxbPAfI"
-    },
-    {
-      "firstName": "sasaasa",
-      "lastName": "saasasa",
-      "email": "san@gmail.com",
-      "userId": "a123",
-      "password": "Sanjay@2005",
-      "dateOfBirth": "2005-07-21",
       "gender": "Male",
       "role": "Reader",
-      "bio": "fdzd",
-      "createdDate": "2026-08-13T05:34:52.195Z",
-      "id": "4NoTX7p6ZhE"
+      "bio": "I am a reader",
+      "createdDate": "2026-08-17T07:33:12.979Z",
+      "id": "mQrjJyS-he8"
     },
     {
       "firstName": "Sanjay",
-      "lastName": "Sam Mathew",
-      "email": "sanjay01@gmail.com",
-      "userId": "sanjay124",
-      "password": "@Sanjay123",
+      "lastName": "Sanjay",
+      "email": "Sanjay@gamil.com",
+      "userId": "sanjay10",
+      "password": "$2a$10$duKDUCjCTcLttnWkYvXD7uG6dgU./LoFEwqSbGT6NtSrnyNpD4VBq",
       "dateOfBirth": "2005-07-20",
       "gender": "Male",
       "role": "Reader",
-      "bio": "A technology enthusiast",
-      "createdDate": "2026-08-13T06:52:18.395Z",
-      "id": "zbOA_0OwM-o"
+      "bio": "good reader",
+      "createdDate": "2026-08-17T07:36:27.717Z",
+      "id": "KpSyV9-CZS4"
     }
   ],
   "articles": [
