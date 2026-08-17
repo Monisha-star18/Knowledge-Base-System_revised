@@ -1,6 +1,8 @@
 let loggedUser = null;       // holds the logged-in user  from localStorage
 let localArticles = [];    
 
+const articleService = new ArticleService(API);
+
 
 $(document).ready(async function () 
 {
@@ -27,18 +29,18 @@ $(document).ready(async function ()
 
 async function fetchAndRenderArticles() 
 {
-    try 
-    {
-        $("#cards-container").html(`<div class="text-center text-muted my-5 w-100">Loading articles...</div>`);
+    try {
 
-        // Fetches only approved, non-deleted articles from the DB
-        const res = await fetch(`${API}/articles?isDeleted=false&status=approved`);
-        if (!res.ok) throw new Error("Failed to load articles");
+        $("#cards-container").html(` <div class="text-center text-muted my-5 w-100"> Loading articles...</div>`);
 
-        localArticles = await res.json();
+        localArticles = await articleService.getArticles({
+            isDeleted: false,
+            status: "approved"
+        });
+
         renderCards();
 
-    } 
+    }
     catch (err) 
     {
         console.error(err);
@@ -111,21 +113,17 @@ function renderCards()
     {
         const articleId = $(this).data("id");
 
-        try 
-        {
-            const res = await fetch(`${API}/articles/${articleId}`);
-            const art = await res.json();
+        try {
 
-            //  views + 1
-            await fetch(`${API}/articles/${articleId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ views: (art.views || 0) + 1 })
-            });
-            
+            // Get article
+            const article = await articleService.getArticleById(articleId);
+
+            // Increase views
+            await articleService.updateArticle(articleId,{views: (article.views || 0) + 1});
+
             await fetchAndRenderArticles();
 
-        } 
+        }
         
         catch (err) 
         {
