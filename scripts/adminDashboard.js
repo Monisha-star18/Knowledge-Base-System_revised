@@ -253,7 +253,9 @@ $(document).on("click", ".btn-card-accept, .btn-card-reject", async function ()
         alert("Update failed: " + err.message);
     }
 
-    $("#adminLogout").on("click",function(){
+    
+});
+
+$("#adminLogout").on("click",function(){
         handleLogout()
     })
-});

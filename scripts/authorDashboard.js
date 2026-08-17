@@ -1,6 +1,11 @@
+import {  API,  setupProfile, handleLogout } from './shared.js';
+
+import { ArticleService } from './services/articleService.js';
+
 let loggedUser = null;
 let localArticles = []; 
 let currentFilter = "all";
+
 const articleService = new ArticleService(API);
 
 $(document).ready(async function () {
@@ -261,5 +266,10 @@ $(document).on("click", ".restorSpecificArticle",  function()
                 }
             }
         });
+
 });
+
+$("#authorLogout").on("click",function(){
+        handleLogout()
+    })
 
