@@ -1,6 +1,4 @@
-import { API } from './shared.js'; // Import API from shared.js
-import { setupProfile } from './shared.js';
-import { handleLogout } from './shared.js';
+import {  API,  setupProfile, handleLogout } from './shared.js';
 
 import { ArticleService } from './services/articleService.js';
 
