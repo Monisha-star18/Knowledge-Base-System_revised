@@ -206,7 +206,7 @@ $(document).ready(function()
             const password = $("#s-password").val().trim();
             const hashedPassword = bcrypt.hashSync(password, 10);
 
-            // Build user object
+            // Build user object 
             const userData = {
                 firstName: $("#s-firstName").val().trim(),
                 lastName: $("#s-lastName").val().trim(),
@@ -252,12 +252,11 @@ $(document).ready(function()
     $("#loginBtn").on("click", async function (e)
         {
             e.preventDefault();
-            console.log("1st click")
 
             const userId = $("#l-userId").val().trim();
             const password = $("#l-password").val().trim();
 
-            console.log(userId)
+
 
             if (!userId || !password)
             {
@@ -276,9 +275,20 @@ $(document).ready(function()
                 }
 
                 const user = users[0];
+                let isValid = false;
 
-                const isValid = bcrypt.compareSync( password, user.password);
+                console.log(userId)
+                console.log(password)
 
+                if (user.password.startsWith('$2a$')) {
+                    // Hashed password - use bcrypt
+                    isValid = bcrypt.compareSync(password, user.password);
+                } 
+                else 
+                    {
+                    // Plain text password - direct comparison
+                    isValid = (password === user.password);
+                }
 
                 if (!isValid)
                 {
@@ -314,6 +324,7 @@ $(document).ready(function()
             
             catch (err)
             {
+                console.log(err)
                 Swal.fire({icon: "error",title: "Cannot connect to server"});
             }
         });
