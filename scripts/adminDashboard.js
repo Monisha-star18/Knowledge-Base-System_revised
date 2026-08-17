@@ -47,7 +47,10 @@ async function fetchAndRenderArticles()
 
     try 
     {
-        localArticles = await articleService.getArticles(loggedUser.category);
+        localArticles = await articleService.getArticles({
+            category: loggedUser.category,
+            isDeleted: false
+        });
         renderCards();
     }
 
