@@ -93,7 +93,7 @@ function renderCards()
                             <i class="fa-solid fa-pen"></i> Author: ${art.authorName || "Unknown"}
                         </span>
                         <span class="card-meta-item">
-                            <i class="fa-solid fa-calendar-days"></i> Posted on: ${art.createdAt}
+                            <i class="fa-solid fa-calendar-days"></i> Posted on: ${art.reviewDate}
                         </span>
                         <span class="card-meta-item">
                             <i class="fa-solid fa-tag"></i> ${art.category.charAt(0).toUpperCase() + art.category.slice(1)}

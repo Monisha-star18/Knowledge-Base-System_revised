@@ -492,11 +492,14 @@
       "content": "This article discusses business in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth.  in depth. ",
       "image": "https://picsum.photos/seed/article15/800/300",
       "createdAt": "29 Jun 2026",
-      "status": "pending",
+      "status": "approved",
       "id": "ART1015",
-      "reviewDate": null,
+      "reviewDate": "17/08/2026",
       "updatedAt": "Mon Jun 29 2026",
-      "isDeleted": false
+      "isDeleted": false,
+      "remark": "good",
+      "reviewedBy": "rahul654",
+      "views": 1
     },
     {
       "authorId": "dJ8QvM1zKe4",
