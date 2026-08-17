@@ -663,7 +663,7 @@
       "isDeleted": false,
       "remark": "Well written.",
       "reviewedBy": "SANJAY123",
-      "views": 19
+      "views": 20
     },
     {
       "authorId": "eP3HsK7wNc5",
@@ -681,7 +681,8 @@
       "updatedAt": "Mon Jun 29 2026",
       "isDeleted": false,
       "remark": "good",
-      "reviewedBy": "rahul654"
+      "reviewedBy": "rahul654",
+      "views": 1
     },
     {
       "authorId": "dJ8QvM1zKe4",
@@ -700,7 +701,7 @@
       "updatedAt": "Mon Jun 29 2026",
       "remark": "good",
       "reviewedBy": "SANJAY123",
-      "views": 6
+      "views": 9
     },
     {
       "authorId": "eP3HsK7wNc5",

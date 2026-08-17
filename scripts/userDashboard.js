@@ -1,3 +1,9 @@
+import { API } from './shared.js'; // Import API from shared.js
+import { setupProfile } from './shared.js';
+import { handleLogout } from './shared.js';
+
+import { ArticleService } from './services/articleService.js';
+
 let loggedUser = null;       // holds the logged-in user  from localStorage
 let localArticles = [];    
 
@@ -133,6 +139,10 @@ function renderCards()
         window.location.href = `readmore.html?id=${articleId}`;
          
     });
+
+    $("#userLogout").on("click",function(){
+        handleLogout()
+    })
 
     
 }

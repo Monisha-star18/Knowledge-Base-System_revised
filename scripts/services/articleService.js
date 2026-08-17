@@ -1,4 +1,4 @@
-class ArticleService {
+export class ArticleService {
 
     constructor(apiUrl) {
         this.apiUrl = apiUrl;

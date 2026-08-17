@@ -5,7 +5,7 @@ export const API = 'http://localhost:3000'; // Change this to your actual API UR
 
 
 // Populates the user profile information on the page.
-function setupProfile(loggedUser) 
+export function setupProfile(loggedUser) 
 {
     const fullName = `${loggedUser.firstName} ${loggedUser.lastName}`;
     $("#nav-username").text(fullName);
@@ -20,7 +20,7 @@ function setupProfile(loggedUser)
 }
 
 // Displays a logout confirmation dialog.
-function handleLogout() 
+export function handleLogout() 
 {
     Swal.fire({ title: 'LogOut', text: 'Do you want to Log out', icon: 'warning', showCancelButton: true })
         .then(result => {
