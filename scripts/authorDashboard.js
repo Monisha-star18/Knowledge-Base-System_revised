@@ -1,79 +1,111 @@
-import {  API,  setupProfile, handleLogout } from './shared.js';
-
+import { API, setupProfile, handleLogout } from './shared.js';
 import { ArticleService } from './services/articleService.js';
 
 let loggedUser = null;
-let localArticles = []; 
+let localArticles = [];
 let currentFilter = "all";
 
 const articleService = new ArticleService(API);
 
-$(document).ready(async function () {
-
-    // take the login user data 
-    const userData = localStorage.getItem("loggedUser");
-    loggedUser = JSON.parse(userData);
-
-
-   setupProfile(loggedUser); 
-
-    // fetch and render
-    await fetchAndRenderArticles();
-
-    // Filters
-    $("#filters .btn").on("click", function () 
-    {
-        $("#filters .btn").removeClass("active");
-        $(this).addClass("active");
-
-        const id = $(this).attr("id");
-        if (id === "all-btn") currentFilter = "all";
-        if (id === "approved-btn") currentFilter = "approved";
-        if (id === "pending-btn") currentFilter = "pending";
-        if (id === "rejected-btn") currentFilter = "rejected";
-
-        renderCards();
+// ==================== DELETE FUNCTION ====================
+async function deleteArticle(id) {
+    Swal.fire({ 
+        title: 'Delete Article?', 
+        text: 'This article will be removed from your dashboard.', 
+        icon: 'warning', 
+        showCancelButton: true 
+    })
+    .then(async result => {
+        if (result.isConfirmed) {
+            try {
+                await articleService.softDeleteArticle(id);
+                await fetchAndRenderArticles();
+            } catch (err) {
+                console.error(err);
+                Swal.fire({ icon: "error", title: "Delete failed" });
+            }
+        }
     });
+}
 
-    //  Search
-    $("#searchInput").on("input", function () {renderCards();});
-});
+// ==================== RESTORE FUNCTION ====================
+async function restoreArticle() {
+    try {
+        const restoreContainer = $("#restoreModal-content");
+        restoreContainer.empty();
 
+        const localRestoreArticles = await articleService.getArticles({
+            authorId: loggedUser.id,
+            isDeleted: true
+        });
 
+        if (localRestoreArticles.length === 0) {
+            restoreContainer.append(`<div class="text-center text-muted my-4">No deleted articles to restore.</div>`);
+            return;
+        }
 
-// Fetch articles written by this specific author
-async function fetchAndRenderArticles() 
-{
-    try 
-    {
+        localRestoreArticles.forEach(restoreArt => {
+            const restoreCard = `
+                <div class="container restoreSection">
+                    <div class="card p-3 mb-3">          
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-1 fw-semibold">Title: ${restoreArt.title}</p>
+                                <small class="text-muted">Created: ${restoreArt.createdAt}</small>
+                                <div class="mt-1">
+                                    ${restoreArt.status === 'rejected' 
+                                        ? `<span class="badge-rejected">✕ Rejected</span>`  
+                                        : restoreArt.status === 'pending' 
+                                        ? `<span class="badge-pending">⏳ Pending</span>`
+                                        : ""}
+                                </div>
+                            </div>                          
+                            <div>
+                                <button class="btn btn-danger rounded-pill restoreSpecificArticle" data-id="${restoreArt.id}">Restore</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            restoreContainer.prepend(restoreCard);
+        });
+    } catch (err) {
+        console.error(err);
+        Swal.fire({ icon: "error", title: "Could not load deleted articles." });
+    }
+}
+
+// ==================== EXPOSE FUNCTIONS TO GLOBAL SCOPE ====================
+// This is the key fix - makes functions available to inline HTML onclick handlers
+window.deleteArticle = deleteArticle;
+window.restoreArticle = restoreArticle;
+
+// ==================== FETCH AND RENDER ====================
+async function fetchAndRenderArticles() {
+    try {
         localArticles = await articleService.getArticles({
             authorId: loggedUser.id,
             isDeleted: false
         });
         renderCards();
-    } 
-    catch (err) 
-    {
+    } catch (err) {
         console.error(err);
         Swal.fire({ icon: "error", title: "Error loading dashboard feed." });
     }
 }
 
-// Dynamically generate layout cards based on filter and search rules
-function renderCards() 
-{
+function renderCards() {
     const container = $("#cards-container");
     container.empty();
 
     const searchVal = $("#searchInput").val().toLowerCase().trim();
 
-    // Filter 
     let filtered = localArticles.filter(art => {
         const matchesFilter = (currentFilter === "all" || art.status === currentFilter);
         const matchesSearch = art.title.toLowerCase().includes(searchVal) || 
                               art.subtitle.toLowerCase().includes(searchVal) || 
                               art.category.toLowerCase().includes(searchVal);
-        return  matchesFilter && matchesSearch;
+        return matchesFilter && matchesSearch;
     });
 
     if (filtered.length === 0) {
@@ -81,21 +113,16 @@ function renderCards()
         return;
     }
 
-    // Loop & append items
-    filtered.forEach(art => 
-    {
+    filtered.forEach(art => {
         let statusBadge = "";
         let footerRow = "";
         let actionButtons = "";
 
-        if (art.status === "approved") 
-        {
+        if (art.status === "approved") {
             statusBadge = `<span class="badge-approved">✓ Approved</span>`;
             footerRow = `<div class="card-date-row approved"><i class="fa-solid fa-circle-check"></i> Approved on: ${art.reviewDate}</div>`;
-            
-        } 
-        else if (art.status === "rejected") 
-        {
+            // No action buttons for approved articles
+        } else if (art.status === "rejected") {
             statusBadge = `<span class="badge-rejected">✕ Rejected</span>`;
             footerRow = `<div class="card-date-row rejected"><i class="fa-solid fa-circle-xmark"></i> Rejected on: ${art.reviewDate}</div>`;
             actionButtons = `
@@ -103,13 +130,11 @@ function renderCards()
                     <button class="btn-card-edit" onclick="window.location.href='../pages/addArticle.html?id=${art.id}'">
                         <i class="fa-solid fa-pen"></i> Reapply
                     </button>
-                    <button class="btn-card-delete" onclick="deleteArticle('${art.id}')">
+                    <button class="btn-card-delete" data-id="${art.id}">
                         <i class="fa-solid fa-trash"></i> Delete
                     </button>
                 </div>`;
-        } 
-        else 
-        {
+        } else {
             statusBadge = `<span class="badge-pending">⏳ Pending</span>`;
             footerRow = `<div class="card-date-row"><i class="fa-regular fa-clock"></i> Awaiting review</div>`;
             actionButtons = `
@@ -117,7 +142,7 @@ function renderCards()
                     <button class="btn-card-edit" onclick="window.location.href='../pages/addArticle.html?id=${art.id}'">
                         <i class="fa-solid fa-pen"></i> Edit
                     </button>
-                    <button class="btn-card-delete" onclick="deleteArticle('${art.id}')">
+                    <button class="btn-card-delete" data-id="${art.id}">
                         <i class="fa-solid fa-trash"></i> Delete
                     </button>
                 </div>`;
@@ -139,7 +164,6 @@ function renderCards()
                         <span class="card-meta-item">
                             <i class="fa-solid fa-calendar-days"></i> Submitted: ${art.createdAt}
                         </span>
-                        <!-- ternarany operator used to check if  updatedAt these else dont display -->
                         ${art.updatedAt ? `
                         <span class="card-meta-item">
                             <i class="fa-solid fa-calendar-days"></i> Updated: ${art.updatedAt}
@@ -149,127 +173,80 @@ function renderCards()
                         </span>
                     </div>
                     ${footerRow}
-                    ${art.remark ?`<span class="card-meta-item"> Remark : ${art.remark} </span>` : ''}
+                    ${art.remark ? `<span class="card-meta-item"> Remark : ${art.remark} </span>` : ''}
                     ${actionButtons}
                 </div>
             </div>`;
-
         container.prepend(cardHtml);
     });
 }
 
-//delect 
-async function deleteArticle(id) 
-{
-    Swal.fire({ title: 'Delete Article?', text: 'This article will be removed from your dashboard.', icon: 'warning', showCancelButton: true })
-        .then(async result => 
-        {
-            if (result.isConfirmed) 
-            {
-                try 
-                {
-                    await articleService.softDeleteArticle(id);
-                    await fetchAndRenderArticles();
-                }
-                catch (err) 
-                {
+// ==================== DOCUMENT READY ====================
+$(document).ready(async function() {
+    // Get logged user data
+    const userData = localStorage.getItem("loggedUser");
+    loggedUser = JSON.parse(userData);
 
-                    console.error(err);
+    setupProfile(loggedUser);
 
-                    Swal.fire({  icon: "error", title: "Delete failed"});
-                }
-            }
-        });
-}
+    // Fetch and render
+    await fetchAndRenderArticles();
 
-//main restore function work on the restore btn cilcked on page 
-async function restoreArticle() 
-{
-    try
-    {
-        const restoreContainer = $("#restoreModal-content");
-        restoreContainer.empty();
+    // Filters
+    $("#filters .btn").on("click", function() {
+        $("#filters .btn").removeClass("active");
+        $(this).addClass("active");
 
-        const localRestoreArticles = await articleService.getArticles({
-                authorId: loggedUser.id,
-                isDeleted: true
-            });
+        const id = $(this).attr("id");
+        if (id === "all-btn") currentFilter = "all";
+        if (id === "approved-btn") currentFilter = "approved";
+        if (id === "pending-btn") currentFilter = "pending";
+        if (id === "rejected-btn") currentFilter = "rejected";
 
-        if (localRestoreArticles.length === 0) 
-        {
-            restoreContainer.append(`<div class="text-center text-muted my-4">No deleted articles to restore.</div>`);
-            return;
-        }
+        renderCards();
+    });
 
-        localRestoreArticles.forEach(restoreArt => 
-        {
+    // Search
+    $("#searchInput").on("input", function() {
+        renderCards();
+    });
 
-            const restoreCard = `
-                    <div class="container restoreSection">
-                        <div class="card p-3 mb-3">          
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p class="mb-1 fw-semibold">Title: ${restoreArt.title}</p>
-                                    <small class="text-muted">Created: ${restoreArt.createdAt}</small>
-                                    <div class="mt-1">
-                                        ${
-                                            restoreArt.status === 'rejected' 
-                                                ? `<span class="badge-rejected">✕ Rejected</span>`  
-                                            : restoreArt.status === 'pending' 
-                                                ? `<span class="badge-pending">⏳ Pending</span>`
-                                                : ""
-                                        }
-                                    </div>
-                                </div>                          
-                                <div>
-                                    <button class="btn btn-danger rounded-pill restorSpecificArticle" data-id="${restoreArt.id}">Restore</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+    // Restore button - using jQuery event listener instead of inline onclick
+    $("#restoreBtn").on("click", function() {
+        restoreArticle();
+    });
 
-            restoreContainer.prepend(restoreCard);
-        });
-    }
-    catch (err) 
-    {
-        console.error(err);
-        Swal.fire({ icon: "error", title: "Could not load deleted articles." });
-    }
-}
-
-//individuall restore function work on the restore btn cilcked on for particular card 
-
-$(document).on("click", ".restorSpecificArticle",  function() 
-{
-    const restoreId = $(this).data("id");
-    Swal.fire({ title: 'Restore Article?', text: 'This article will be restored.', showCancelButton: true })
-        .then(async result => 
-        {
-            if (result.isConfirmed)
-            {
-                try 
-                {
-
-                    await articleService.restoreArticle(restoreId);
-                    await restoreArticle();
-                    await fetchAndRenderArticles();
-
-                }
-
-                catch (err) 
-                {
-
-                    console.error(err);
-                    Swal.fire({icon: "error",title: "Restore failed"});
-                }
-            }
-        });
-
+    // Logout
+    $("#authorLogout").on("click", function() {
+        handleLogout();
+    });
 });
 
-$("#authorLogout").on("click",function(){
-        handleLogout()
-    })
+// ==================== EVENT DELEGATION FOR DYNAMIC BUTTONS ====================
+// Delete button handler
+$(document).on("click", ".btn-card-delete", function() {
+    const id = $(this).data("id");
+    deleteArticle(id);
+});
 
+// Restore specific article handler
+$(document).on("click", ".restoreSpecificArticle", function() {
+    const restoreId = $(this).data("id");
+    Swal.fire({ 
+        title: 'Restore Article?', 
+        text: 'This article will be restored.', 
+        showCancelButton: true 
+    })
+    .then(async result => {
+        if (result.isConfirmed) {
+            try {
+                await articleService.restoreArticle(restoreId);
+                await restoreArticle();
+                await fetchAndRenderArticles();
+            } catch (err) {
+                console.error(err);
+                Swal.fire({ icon: "error", title: "Restore failed" });
+            }
+        }
+    });
+});
