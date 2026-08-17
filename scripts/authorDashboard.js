@@ -1,6 +1,7 @@
 let loggedUser = null;
 let localArticles = []; 
 let currentFilter = "all";
+const articleService = new ArticleService(API);
 
 $(document).ready(async function () {
 
@@ -40,9 +41,10 @@ async function fetchAndRenderArticles()
 {
     try 
     {
-        const res = await fetch(`${API}/articles?authorId=${loggedUser.id}&isDeleted=false`);
-        if (!res.ok) throw new Error("Failed to load articles");
-        localArticles = await res.json();
+        localArticles = await articleService.getArticles({
+            authorId: loggedUser.id,
+            isDeleted: false
+        });
         renderCards();
     } 
     catch (err) 
@@ -159,12 +161,18 @@ async function deleteArticle(id)
         {
             if (result.isConfirmed) 
             {
-                await fetch(`${API}/articles/${id}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ isDeleted: true })
-                });
-                await fetchAndRenderArticles();
+                try 
+                {
+                    await articleService.softDeleteArticle(id);
+                    await fetchAndRenderArticles();
+                }
+                catch (err) 
+                {
+
+                    console.error(err);
+
+                    Swal.fire({  icon: "error", title: "Delete failed"});
+                }
             }
         });
 }
@@ -177,9 +185,10 @@ async function restoreArticle()
         const restoreContainer = $("#restoreModal-content");
         restoreContainer.empty();
 
-        const restore = await fetch(`${API}/articles?authorId=${loggedUser.id}&isDeleted=true`);
-        if (!restore.ok) throw new Error("Failed to load articles");
-        let localRestoreArticles = await restore.json();
+        const localRestoreArticles = await articleService.getArticles({
+                authorId: loggedUser.id,
+                isDeleted: true
+            });
 
         if (localRestoreArticles.length === 0) 
         {
@@ -235,13 +244,21 @@ $(document).on("click", ".restorSpecificArticle",  function()
         {
             if (result.isConfirmed)
             {
-                await fetch(`${API}/articles/${restoreId}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ isDeleted: false })
-                });
-                await restoreArticle()
-                await fetchAndRenderArticles();
+                try 
+                {
+
+                    await articleService.restoreArticle(restoreId);
+                    await restoreArticle();
+                    await fetchAndRenderArticles();
+
+                }
+
+                catch (err) 
+                {
+
+                    console.error(err);
+                    Swal.fire({icon: "error",title: "Restore failed"});
+                }
             }
         });
 });
