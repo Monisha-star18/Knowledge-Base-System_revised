@@ -1,10 +1,7 @@
-
-import {  API,  setupProfile, handleLogout } from './shared.js';
-
+import { API, setupProfile, handleLogout } from './shared.js';
 import { ArticleService } from './services/articleService.js';
 
 const articleService = new ArticleService(API);
-
 
 // Current Date  
 const today = new Date();
@@ -19,9 +16,7 @@ const isEditMode = !!editId;
 let originalArticle = null; // stores original article data in edit mode
 
 // ── Edit Mode 
-if (isEditMode) 
-{
-
+if (isEditMode) {
     // update page title and header text
     document.title = 'Edit Article – InsightHub';
     const headingEl = document.querySelector('.header-heading');
@@ -38,22 +33,17 @@ if (isEditMode)
     if (date) date.textContent = 'Update Date : ' + displayDate;
 
     // fetch the existing article and fill the form
-    async function loadArticle(editId) 
-    {
-        try 
-        {
-            const res = await fetch(`${API}/articles/${editId}`);
-            if (!res.ok) throw new Error('Article not found');
-
-            const article = await res.json();
+    async function loadArticle(id) {
+        try {
+            const article = await articleService.getArticleById(id);
             originalArticle = article;
 
             // fill all form fields with existing article data
-            document.getElementById('articleTitle').value    = article.title;
+            document.getElementById('articleTitle').value = article.title;
             document.getElementById('articleSubtitle').value = article.subtitle;
             document.getElementById('articleCategory').value = article.category;
-            document.getElementById('articleIntro').value    = article.intro;
-            document.getElementById('articleContent').value  = article.content;
+            document.getElementById('articleIntro').value = article.intro;
+            document.getElementById('articleContent').value = article.content;
 
             // show admin remark if available
             if (article.remark) {
@@ -68,65 +58,46 @@ if (isEditMode)
                     `);
                 }
             }
-        } 
-        catch (err) 
-        {
+        } catch (err) {
             console.error(err);
             await Swal.fire({ icon: 'error', title: 'Could not load article', text: 'Redirecting to dashboard.' });
             window.location.href = '../pages/authorDashboard.html';
         }
     }
 
-    
     loadArticle(editId);
 }
 
 // ── Clear Form ─
-function clearForm() 
-{
+function clearForm() {
     Swal.fire({ title: 'Clear form?', text: 'All entered content will be removed.', icon: 'warning', showCancelButton: true })
         .then(result => {
-            if (result.isConfirmed) 
-            {
+            if (result.isConfirmed) {
                 document.getElementById('articleForm').reset();
                 document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
             }
         });
 }
 
-// ── Validation 
-// Returns true if field has a value, false and marks invalid if empty
-// function validate(id) 
-// {
-//     const element = document.getElementById(id);
-   
-//     const empty = element.value.trim() === '';
-//     element.classList.toggle('is-invalid', empty);
-//     return !empty;
-
-
-// }
 // ── shared regex: letters and spaces only ──
 const allowedTextRegex = /^(?=.*[a-zA-Z])[a-zA-Z0-9. ]+$/;
-function validate(id) 
-{
+
+function validate(id) {
     const element = document.getElementById(id);
     const value = element.value.trim();
     const msgEl = element.closest('.mb-field').querySelector('.invalid-msg');
 
     // check 1 — empty
-    if (value === '') 
-    {
+    if (value === '') {
         element.classList.add('is-invalid');
         if (msgEl) msgEl.textContent = 'This field is required.';
         return false;
     }
 
     // check 2 — letters and spaces only
-    if (!allowedTextRegex.test(value)) 
-    {
+    if (!allowedTextRegex.test(value)) {
         element.classList.add('is-invalid');
-        if (msgEl) msgEl.textContent = 'Only number not  are allowed.';
+        if (msgEl) msgEl.textContent = 'Only letters, numbers, dots and spaces are allowed.';
         return false;
     }
 
@@ -136,8 +107,7 @@ function validate(id)
 }
 
 // ── Form Submit
-document.getElementById('articleForm').addEventListener('submit', async function (e) 
-{
+document.getElementById('articleForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
     // check session
@@ -150,39 +120,37 @@ document.getElementById('articleForm').addEventListener('submit', async function
 
     // validate all fields before submitting
     const ok = [
-        validate('articleTitle'),validate('articleCategory'),
-        validate('articleSubtitle'),validate('articleIntro'),
+        validate('articleTitle'),
+        validate('articleCategory'),
+        validate('articleSubtitle'),
+        validate('articleIntro'),
         validate('articleContent')
     ].every(Boolean);
 
     if (!ok) return;
 
-    try 
-    {
+    try {
         // ── EDIT MODE
-        if (isEditMode) 
-        {
-
-            const updatedArticle = 
-            {
-                ...originalArticle,  // keep image, authorId, authorName, createdAt etc.
-                title:      document.getElementById('articleTitle').value.trim(),
-                subtitle:   document.getElementById('articleSubtitle').value.trim(),
-                category:   document.getElementById('articleCategory').value,
-                intro:      document.getElementById('articleIntro').value.trim(),
-                content:    document.getElementById('articleContent').value.trim(),
-                status:     'pending', // reset to pending for re-review
+        if (isEditMode) {
+            const updatedArticle = {
+                ...originalArticle, // keep image, authorId, authorName, createdAt etc.
+                title: document.getElementById('articleTitle').value.trim(),
+                subtitle: document.getElementById('articleSubtitle').value.trim(),
+                category: document.getElementById('articleCategory').value,
+                intro: document.getElementById('articleIntro').value.trim(),
+                content: document.getElementById('articleContent').value.trim(),
+                status: 'pending', // reset to pending for re-review
                 reviewDate: null,
-                updatedAt:  displayDate // today's date auto-set
+                updatedAt: displayDate // today's date auto-set
             };
 
             // check if anything actually changed compared to original
             const hasChanged =
-                updatedArticle.title    !== originalArticle.title    ||
+                updatedArticle.title !== originalArticle.title ||
                 updatedArticle.subtitle !== originalArticle.subtitle ||
                 updatedArticle.category !== originalArticle.category ||
-                updatedArticle.intro    !== originalArticle.intro    ||
-                updatedArticle.content  !== originalArticle.content;
+                updatedArticle.intro !== originalArticle.intro ||
+                updatedArticle.content !== originalArticle.content;
 
             // nothing changed — block update
             if (!hasChanged) {
@@ -192,72 +160,67 @@ document.getElementById('articleForm').addEventListener('submit', async function
 
             // something changed — ask for confirmation before saving
             const confirm = await Swal.fire({
-                icon: 'question',title: 'Update Article?',
+                icon: 'question',
+                title: 'Update Article?',
                 text: 'Are you sure you want to resubmit this article for review?',
-                showCancelButton: true,confirmButtonText: 'Yes, Update'});
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Update'
+            });
 
             if (!confirm.isConfirmed) return;
 
-            const saveRes = await fetch(`${API}/articles/${editId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedArticle)
-            });
-
-            if (!saveRes.ok) throw new Error('Could not update.');
+            // Use ArticleService for update
+            await articleService.updateArticle(editId, updatedArticle);
 
             Swal.fire({ icon: 'success', title: 'Article updated!', text: 'Resubmitted for review.' })
                 .then(() => { window.location.href = '../pages/authorDashboard.html'; });
+        }
 
-       
-        } 
-
-         // ── CREATE MODE
-        else 
-        {
+        // ── CREATE MODE
+        else {
             // count existing articles by this author to generate a unique image seed
-            const countRes = await fetch(`${API}/articles?authorId=${loggedUser.id}`);
-            const existingArticles = await countRes.json();
+            const existingArticles = await articleService.getArticles({ 
+                authorId: loggedUser.id,
+                isDeleted: false 
+            });
             const nextIndex = existingArticles.length + 1;
 
             const article = {
-                authorId:   loggedUser.id,
+                authorId: loggedUser.id,
                 authorName: `${loggedUser.firstName} ${loggedUser.lastName}`,
-                title:      document.getElementById('articleTitle').value.trim(),
-                category:   document.getElementById('articleCategory').value,
-                subtitle:   document.getElementById('articleSubtitle').value.trim(),
-                intro:      document.getElementById('articleIntro').value.trim(),
-                content:    document.getElementById('articleContent').value.trim(),
-                image:      `https://picsum.photos/seed/article${nextIndex}/800/300`,
-                createdAt:  displayDate,
-                status:     'pending',
+                title: document.getElementById('articleTitle').value.trim(),
+                category: document.getElementById('articleCategory').value,
+                subtitle: document.getElementById('articleSubtitle').value.trim(),
+                intro: document.getElementById('articleIntro').value.trim(),
+                content: document.getElementById('articleContent').value.trim(),
+                image: `https://picsum.photos/seed/article${nextIndex}/800/300`,
+                createdAt: displayDate,
+                status: 'pending',
                 reviewDate: null,
-                isDeleted:  false
+                isDeleted: false
             };
 
-            const saveRes = await fetch(`${API}/articles`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(article)
-            });
-
-            if (!saveRes.ok) throw new Error('Could not post.');
+            // Use ArticleService for create
+            await articleService.createArticle(article);
 
             Swal.fire({ icon: 'success', title: 'Article submitted!' })
                 .then(() => { window.location.href = '../pages/authorDashboard.html'; });
         }
-
-    } 
-    
-    catch (err) 
-    {
+    } catch (err) {
         console.error(err);
-        Swal.fire({ icon: 'error', title: isEditMode ? 'Update Failed' : 'Submission Failed' });
+        Swal.fire({ 
+            icon: 'error', 
+            title: isEditMode ? 'Update Failed' : 'Submission Failed',
+            text: err.message || 'Please try again later.'
+        });
     }
 });
 
 // Clears red border as soon as user starts typing in any field
 document.querySelectorAll('.field-input, .field-select, .field-textarea').forEach(formElement => {
-    formElement.addEventListener('input',  () => formElement.classList.remove('is-invalid'));
+    formElement.addEventListener('input', () => formElement.classList.remove('is-invalid'));
     formElement.addEventListener('change', () => formElement.classList.remove('is-invalid'));
 });
+
+// Make clearForm available globally for the inline onclick
+window.clearForm = clearForm;
