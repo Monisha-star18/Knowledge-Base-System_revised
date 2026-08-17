@@ -2,6 +2,9 @@
 
 $(document).ready(function()
 {
+
+    const userService = new UserService(API);
+
     //custom rule for date 
     $.validator.addMethod(
         //rule name
@@ -181,8 +184,7 @@ $(document).ready(function()
         try 
         {
             // Check email duplicate
-            const emailRes  = await fetch(`${API}/users?email=${email}`);
-            const emailData = await emailRes.json();
+            const emailData = await userService.getUserByEmail(email);
 
             if (emailData.length > 0) 
             {
@@ -194,8 +196,7 @@ $(document).ready(function()
             }
 
             // Check userId duplicate
-            const userIdRes  = await fetch(`${API}/users?userId=${userId}`);
-            const userIdData = await userIdRes.json();
+            const userIdData = await userService.getUserByUserId(userId);
 
             if (userIdData.length > 0) 
             {
@@ -220,18 +221,8 @@ $(document).ready(function()
                 createdDate: new Date().toISOString()
             };
 
-            // POST to API
-            const saveRes = await fetch(`${API}/users`, {
-                method:  "POST",
-                headers: { "Content-Type": "application/json" },
-                body:    JSON.stringify(userData)
-            });
-
-            // if cant post the data in json
-            if (!saveRes.ok) {
-                await Swal.fire({ icon: "error", title: "Error", text: "Could not create account. Please try again." });
-                return;
-            }
+            // POST 
+            await userService.createUser(userData);
 
             //used to clear the sign up form 
             clearSignUp();
@@ -275,10 +266,7 @@ $(document).ready(function()
 
             try
             {
-                const result = await fetch(`${API}/users?userId=${userId}`);
-                const users = await result.json();
-
-                console.log()
+                const users = await userService.getUserByUserId(userId);
 
                 if (users.length === 0)
                 {
@@ -319,6 +307,7 @@ $(document).ready(function()
 
                 
             }
+            
             catch (err)
             {
                 Swal.fire({icon: "error",title: "Cannot connect to server"});
