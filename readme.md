@@ -245,6 +245,9 @@ Knowledge Base System/
 │   └── userDashboard.html
 │
 ├── scripts/
+|   ├── services/
+|   |        ├──articleService.js
+|   |        ├──userService.js
 │   ├── addArticle.js
 │   ├── adminDashboard.js
 │   ├── authorDashboard.js
@@ -379,7 +382,7 @@ Include screenshots of the following pages:
 ## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/InsightHub.git
+git clone https://github.com/Monisha-star18/Knowledge-Base-System_revised
 ```
 
 ---
